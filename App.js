@@ -1,28 +1,55 @@
 import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useState } from "react";
+import { Button, StyleSheet, Text, View } from "react-native";
+import { GoalsList } from "./components/GoalsList/GoalsList";
+import { ModalWindow } from "./components/ModalWindow/ModalWindow";
 
 export default function App() {
+  const [inputValue, setInputValue] = useState("");
+  const [goals, setGoals] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleChangeInputValue = (val) => {
+    setInputValue(val);
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleAddGoal = () => {
+    const copy = [...goals];
+
+    if (inputValue.length) {
+      copy.push(inputValue);
+    }
+
+    setIsModalOpen(false);
+    setInputValue("");
+    setGoals(copy);
+  };
+
+  const handleDeleteGoal = (goal) => {
+    const filtered = goals.filter((item) => item !== goal);
+    setGoals(filtered);
+  };
+
   return (
     <>
       <StatusBar />
+
+      <ModalWindow
+        isOpen={isModalOpen}
+        inputValue={inputValue}
+        handleAddGoal={handleAddGoal}
+        handleChangeInputValue={handleChangeInputValue}
+      />
+
       <View style={styles.appContainer}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Enter your goal here"
-          />
-          <TouchableOpacity activeOpacity={0.8} style={styles.addButton}>
-            <Text style={styles.buttonText}>Add goal</Text>
-          </TouchableOpacity>
-        </View>
+        <Button title="Add new goal" onPress={handleOpenModal} />
         <View>
           <Text style={styles.yourGoals}>List of goals</Text>
+          <GoalsList goals={goals} handleDeleteGoal={handleDeleteGoal} />
         </View>
       </View>
     </>
@@ -31,34 +58,8 @@ export default function App() {
 
 const styles = StyleSheet.create({
   appContainer: {
-    padding: 50,
+    paddingTop: 64,
     paddingHorizontal: 16,
-  },
-  inputContainer: {
-    display: "flex",
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    height: 50,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    paddingHorizontal: 16,
-    flex: 1,
-    height: 50,
-  },
-  addButton: {
-    height: 50,
-    padding: 16,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    backgroundColor: "orange",
-  },
-  buttonText: {
-    color: "white",
   },
   yourGoals: {
     fontSize: 24,
